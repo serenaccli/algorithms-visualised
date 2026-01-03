@@ -272,6 +272,7 @@ const AlgorithmExplorer = () => {
   const [showRangeQuery, setShowRangeQuery] = useState(false);
   // Sliding Window state
   const [slidingWindowArray, setSlidingWindowArray] = useState([1, 3, -1, -3, 5, 3, 6, 7]);
+  const [slidingWindowInputValue, setSlidingWindowInputValue] = useState('1, 3, -1, -3, 5, 3, 6, 7');
   const [windowSize, setWindowSize] = useState(3);
   const [windowPreset, setWindowPreset] = useState('maxsubarray');
   const [showWindowInput, setShowWindowInput] = useState(false);
@@ -3197,7 +3198,10 @@ const renderVisualization = () => {
               placeholder="Window size"
             />
             <button
-              onClick={() => setShowWindowInput(!showWindowInput)}
+              onClick={() => {
+                setSlidingWindowInputValue(slidingWindowArray.join(', '));
+                setShowWindowInput(!showWindowInput);
+              }}
               style={{
                 ...styles.button,
                 background: '#475569',
@@ -3213,18 +3217,23 @@ const renderVisualization = () => {
           <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
             <input
               type="text"
-              value={slidingWindowArray.join(', ')}
-              onChange={(e) => {
-                const newArray = e.target.value.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
-                if (newArray.length > 0) setSlidingWindowArray(newArray);
-              }}
+              value={slidingWindowInputValue}
+              onChange={(e) => setSlidingWindowInputValue(e.target.value)}
               style={styles.input}
               placeholder="Enter numbers separated by commas"
             />
             <button
               onClick={() => {
-                setShowWindowInput(false);
-                runAlgorithm();
+                try {
+                  const newArray = slidingWindowInputValue.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
+                  if (newArray.length > 0) {
+                    setSlidingWindowArray(newArray);
+                    setShowWindowInput(false);
+                    runAlgorithm();
+                  }
+                } catch (e) {
+                  console.error('Invalid input');
+                }
               }}
               style={{
                 ...styles.button,
